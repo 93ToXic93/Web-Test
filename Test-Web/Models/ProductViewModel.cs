@@ -7,6 +7,7 @@ namespace Test_Web.Models
 {
     public class ProductViewModel
     {
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Field {0} is required!")]
         [Display(Name = "Product name")]

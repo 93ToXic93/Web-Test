@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Test_Web.Contracts;
 using Test_Web.Data;
@@ -13,7 +14,7 @@ namespace Test_Web.Services
 
         public ProductService(WebDbContext context)
         {
-            this.context = context; 
+            this.context = context;
         }
 
         public async Task CreateProductAsync(ProductViewModel viewModel)
@@ -39,24 +40,82 @@ namespace Test_Web.Services
 
         }
 
-        public Task DeleteProductAsync(int id)
+        public async Task DeleteProductAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await context.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                throw new ArgumentException("Not Found!");
+            }
+            else
+            {
+                context.Products.Remove(product);
+            }
+
+            await context.SaveChangesAsync();
         }
 
-        public Task<ProductViewModel> UpdateProductAsync(ProductViewModel viewModel)
+
+        public async Task UpdateProductAsync(ProductViewModel model)
         {
-            throw new NotImplementedException();
+
+            var prod = await context.Products.FindAsync(model.Id);
+
+            if (prod == null)
+            {
+                throw new ArgumentException();
+            }
+
+            prod.Name = model.Name;
+            prod.Amount = model.Amount;
+            prod.Price = model.Price;
+            prod.Type = model.Type;
+            prod.Description = model.Description;
+
+            await context.SaveChangesAsync();
         }
 
-        public Task<ProductViewModel> GetByIdAsync(int id)
+        public async Task<List<ProductViewModel>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var products = await context.Products
+                .AsNoTracking()
+                .Where(x => x.Name != null && x.Name != string.Empty)
+                .Select(x => new ProductViewModel()
+                {
+                    Name = x.Name,
+                    Description = x.Description,
+                    Type = x.Type,
+                    Amount = x.Amount,
+                    Price = x.Price,
+                    Id = x.Id
+                })
+                .ToListAsync();
+
+            return products;
         }
 
-        public Task<IEnumerable<ProductViewModel>> GetAllAsync()
+        public async Task<ProductViewModel> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var prod = await context.Products.FindAsync(id);
+
+            if (prod == null)
+            {
+                throw new ArgumentException("Not found!");
+            }
+
+            ProductViewModel productView = new ProductViewModel()
+            {
+                Id = prod.Id,
+                Name = prod.Name,
+                Description = prod.Description,
+                Type = prod.Type,
+                Amount = prod.Amount,
+                Price = prod.Price,
+            };
+
+
+            return productView;
         }
     }
 }

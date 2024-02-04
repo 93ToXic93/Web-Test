@@ -9,11 +9,10 @@ namespace Test_Web.Contracts
 
         Task DeleteProductAsync(int id);
 
-        Task<ProductViewModel> UpdateProductAsync(ProductViewModel viewModel);
+        Task UpdateProductAsync(ProductViewModel model);
+
+        Task<List<ProductViewModel>> GetAllAsync();
 
         Task<ProductViewModel> GetByIdAsync(int id);
-
-        Task<IEnumerable<ProductViewModel>> GetAllAsync();
-
     }
 }
