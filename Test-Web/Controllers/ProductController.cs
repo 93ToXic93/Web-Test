@@ -15,13 +15,16 @@ namespace Test_Web.Controllers
             _service = service;
         }
 
-
-        public async Task<IActionResult> Index(ProductViewModel model)
+        [HttpGet]
+        public IActionResult Create()
         {
+            ProductViewModel product = new ProductViewModel();
 
-            return View();
+            return View(product);
         }
 
+
+        [HttpPost]
         public async Task<IActionResult> Create(ProductViewModel model)
         {
             if (!ModelState.IsValid)
@@ -40,6 +43,7 @@ namespace Test_Web.Controllers
             return RedirectToAction(nameof(Succses));
         }
 
+        [HttpGet]
         public async Task<IActionResult> Explore()
         {
             var model = await _service.GetAllAsync();
